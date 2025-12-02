@@ -7,8 +7,6 @@ const questionSelect = document.getElementById("question-select");
 const useQuestionBtn = document.getElementById("use-question");
 
 let isWaiting = false;
-
-// Keep a short client-side history (last few turns)
 let history = [];
 
 // ---------- Stage-based suggestion library ----------
@@ -81,7 +79,6 @@ function populateQuestionSuggestions(stageKey) {
   });
 }
 
-// Hook up dropdowns
 if (stageSelect) {
   stageSelect.addEventListener("change", () => {
     populateQuestionSuggestions(stageSelect.value);
@@ -97,7 +94,30 @@ if (useQuestionBtn && questionSelect) {
   });
 }
 
-// ---------- Chat UI helpers ----------
+// ---------- Helpers for text formatting & speech ----------
+
+// Escape HTML and turn newlines into <br> for assistant messages
+function formatAssistantText(text) {
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  return escaped.replace(/\n/g, "<br>");
+}
+
+function speakText(text) {
+  if (!("speechSynthesis" in window)) {
+    alert("Your browser doesn’t support read aloud on this device.");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 1;   // adjust if needed (0.5–2)
+  utterance.pitch = 1;
+  window.speechSynthesis.speak(utterance);
+}
+
+// ---------- Chat UI ----------
 
 function addMessage(role, text) {
   const wrapper = document.createElement("div");
@@ -109,13 +129,27 @@ function addMessage(role, text) {
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  bubble.textContent = text;
+
+  if (role === "assistant") {
+    bubble.innerHTML = formatAssistantText(text);
+
+    // add read-aloud button
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "speak-btn";
+    btn.innerHTML = "🔊 Read this";
+    btn.addEventListener("click", () => speakText(text));
+    bubble.appendChild(document.createElement("br"));
+    bubble.appendChild(btn);
+  } else {
+    bubble.textContent = text;
+  }
 
   wrapper.appendChild(meta);
   wrapper.appendChild(bubble);
 
   chatWindow.appendChild(wrapper);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
+  chatWindow.scrollTop = chatWindow.scrollHeight; // auto-scroll to bottom
 }
 
 function showTypingIndicator() {
@@ -153,11 +187,8 @@ form.addEventListener("submit", async (e) => {
 
   const section = stageSelect ? stageSelect.value : "";
 
-  // Update local history (keep it short)
   history.push({ role: "user", content: text });
-  if (history.length > 10) {
-    history = history.slice(history.length - 10);
-  }
+  if (history.length > 10) history = history.slice(-10);
 
   addMessage("user", text);
   input.value = "";
@@ -184,11 +215,8 @@ form.addEventListener("submit", async (e) => {
 
     addMessage("assistant", replyText);
 
-    // Add assistant message to history
     history.push({ role: "assistant", content: replyText });
-    if (history.length > 10) {
-      history = history.slice(history.length - 10);
-    }
+    if (history.length > 10) history = history.slice(-10);
   } catch (err) {
     console.error(err);
     removeTypingIndicator();

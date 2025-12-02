@@ -154,19 +154,19 @@ body {
 
 #chat-window {
   flex: 1;
-  background: rgba(10, 30, 63, 0.85);
+  background: rgba(10, 30, 63, 0.9);
   border-radius: 16px;
-  padding: 12px;
+  padding: 14px;
   border: 1px solid rgba(212, 160, 24, 0.25);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
   overflow-y: auto;
-  max-height: 60vh;
+  max-height: 65vh;
 }
 
 /* Messages */
 
 .message {
-  margin-bottom: 10px;
+  margin-bottom: 14px;
   display: flex;
   animation: fadeIn 0.18s ease-out;
 }
@@ -181,10 +181,11 @@ body {
 
 .bubble {
   max-width: 80%;
-  padding: 8px 10px;
+  padding: 10px 12px 10px;
   border-radius: 18px;
-  font-size: 0.9rem;
-  line-height: 1.35;
+  font-size: 1rem;           /* bigger text */
+  line-height: 1.5;          /* more spacing between lines */
+  white-space: normal;
 }
 
 .user .bubble {
@@ -200,9 +201,9 @@ body {
 }
 
 .message-meta {
-  font-size: 0.65rem;
-  margin-bottom: 2px;
-  opacity: 0.7;
+  font-size: 0.7rem;
+  margin-bottom: 3px;
+  opacity: 0.75;
 }
 
 .message.assistant .message-meta {
@@ -214,10 +215,31 @@ body {
   text-align: right;
 }
 
+/* Speak (read aloud) button */
+
+.speak-btn {
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 171, 233, 0.5);
+  background: rgba(10, 30, 63, 0.9);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.speak-btn:hover {
+  background: rgba(32, 56, 104, 0.95);
+  color: var(--text-main);
+}
+
 /* Typing indicator */
 
 .typing {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
   margin-top: 4px;
 }
@@ -249,12 +271,12 @@ body {
 
 #user-input {
   flex: 1;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-radius: 999px;
   border: 1px solid rgba(148, 171, 233, 0.4);
   background: rgba(5, 8, 20, 0.9);
   color: var(--text-main);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   outline: none;
 }
 
@@ -271,12 +293,12 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 10px 14px;
+  padding: 10px 16px;
   border-radius: 999px;
   border: none;
   background: var(--kcc-gold);
   color: var(--kcc-navy);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
@@ -299,7 +321,7 @@ body {
 }
 
 .hint {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
   margin: 3px 2px 0;
 }
@@ -338,7 +360,7 @@ body {
   }
 
   #chat-window {
-    max-height: 55vh;
+    max-height: 60vh;
   }
 
   .brand-text h1 {
