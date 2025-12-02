@@ -1,32 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Digital Tech IA Helper</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Digital Tech 7/8 – IA Helper | King's Christian College</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/style.css" />
 </head>
 
 <body>
-  <div class="container">
-    <header>
-      <h1>Digital Tech 7/8 — IA Helper</h1>
-      <p class="subtitle">Ask for help with your workbook, API ideas, algorithms, or code.</p>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand">
+        <!-- Replace src with your real logo path if needed -->
+        <img src="/kings-logo.png" alt="King's Christian College logo" class="brand-logo" />
+        <div class="brand-text">
+          <h1>Digital Tech 7/8 – IA Helper</h1>
+          <p>King’s Christian College · API Game App Support</p>
+        </div>
+      </div>
+      <div class="tagline">
+        <span>Live Purposefully · Love Faithfully · Learn Passionately · Lead Diligently</span>
+      </div>
     </header>
 
-    <div id="chat-window"></div>
+    <main class="app-main">
+      <!-- NEW: Stage + suggestion helper panel -->
+      <section class="helper-panel" aria-label="Stage helper">
+        <div class="helper-field">
+          <label for="stage-select">Stage</label>
+          <select id="stage-select">
+            <option value="">Choose a stage…</option>
+            <option value="stage1">Stage 1 – Digital systems & networks</option>
+            <option value="stage2">Stage 2 – Binary, pixels & data</option>
+            <option value="stage3">Stage 3 – APIs & ideas</option>
+            <option value="stage4">Stage 4 – User stories & screens</option>
+            <option value="stage5">Stage 5 – Algorithms & flowcharts</option>
+            <option value="stage6">Stage 6 – Coding in Swift</option>
+            <option value="stage7">Stage 7 – Debugging & improving</option>
+            <option value="stage8">Stage 8 – Video & reflection</option>
+          </select>
+        </div>
 
-    <form id="chat-form">
-      <input
-        type="text"
-        id="user-input"
-        placeholder="Type your question…"
-        autocomplete="off"
-        required
-      />
-      <button type="submit">Send</button>
-    </form>
+        <div class="helper-field">
+          <label for="question-select">Suggested question</label>
+          <select id="question-select">
+            <option value="">Pick a stage first…</option>
+          </select>
+        </div>
+
+        <button type="button" id="use-question" class="use-question-btn">
+          Use suggestion
+        </button>
+      </section>
+
+      <section id="chat-window" aria-label="Chat messages"></section>
+
+      <form id="chat-form" autocomplete="off">
+        <input
+          type="text"
+          id="user-input"
+          placeholder="Ask for help – e.g. “I’m stuck on my API idea”"
+          aria-label="Type your question for the IA helper"
+          required
+        />
+        <button type="submit" id="send-button">
+          <span class="btn-label">Send</span>
+          <span class="btn-icon">➤</span>
+        </button>
+      </form>
+      <p class="hint">
+        Tip: Be specific. Say what slide or task you’re on (e.g. “Stage 3 API slide”, “Stage 5 flowchart”, “Stage 6 Swift error”).
+      </p>
+    </main>
+
+    <footer class="app-footer">
+      <small>
+        This helper uses the OpenAI API and supports ACARA v9 Digital Technologies outcomes (e.g. AC9TDI8P04, P05, P09).
+        It will not complete your assessment for you – it coaches you through it.
+      </small>
+    </footer>
   </div>
 
-  <script src="script.js"></script>
+  <script src="/script.js"></script>
 </body>
 </html>

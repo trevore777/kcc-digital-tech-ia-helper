@@ -1,70 +1,79 @@
-body {
-  font-family: Arial, sans-serif;
-  background: #0A1E3F;
-  color: white;
-  margin: 0;
-}
+/* Helper panel (stage + suggestions) */
 
-.container {
-  max-width: 700px;
-  margin: auto;
-  padding: 20px;
-}
-
-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-#chat-window {
-  background: #102A54;
-  padding: 15px;
-  height: 60vh;
-  overflow-y: auto;
-  border-radius: 8px;
-  border: 1px solid #2A3D66;
-}
-
-.message {
-  margin-bottom: 12px;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.user {
-  background: #D4A018;
-  color: #0A1E3F;
-  text-align: right;
-}
-
-.assistant {
-  background: #1B376B;
-  color: white;
-}
-
-form {
+.helper-panel {
   display: flex;
-  margin-top: 15px;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: rgba(10, 30, 63, 0.85);
+  border: 1px solid rgba(212, 160, 24, 0.4);
 }
 
-form input {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 6px;
-  margin-right: 10px;
+.helper-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 180px;
+  flex: 1 1 0;
 }
 
-form button {
-  padding: 12px 20px;
-  background: #D4A018;
-  color: #0A1E3F;
-  font-weight: bold;
+.helper-field label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.helper-field select {
+  padding: 6px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 171, 233, 0.4);
+  background: rgba(5, 8, 20, 0.9);
+  color: var(--text-main);
+  font-size: 0.8rem;
+}
+
+.helper-field select:focus {
+  outline: none;
+  border-color: var(--kcc-gold);
+  box-shadow: 0 0 0 1px rgba(212, 160, 24, 0.5);
+}
+
+.use-question-btn {
+  padding: 8px 14px;
+  border-radius: 999px;
   border: none;
-  border-radius: 6px;
+  background: transparent;
+  color: var(--kcc-gold-light);
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
+  border: 1px solid rgba(212, 160, 24, 0.6);
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  flex: 0 0 auto;
 }
 
-form button:hover {
-  background: #f0bf3a;
+.use-question-btn:hover {
+  background: var(--kcc-gold);
+  color: var(--kcc-navy);
+  transform: translateY(-1px);
+}
+
+.use-question-btn:active {
+  transform: translateY(0);
+}
+
+/* Make helper panel stack better on small screens */
+
+@media (max-width: 600px) {
+  .helper-panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .use-question-btn {
+    width: 100%;
+    text-align: center;
+  }
 }
