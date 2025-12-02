@@ -8,6 +8,9 @@ const useQuestionBtn = document.getElementById("use-question");
 
 let isWaiting = false;
 
+// Keep a short client-side history (last few turns)
+let history = [];
+
 // ---------- Stage-based suggestion library ----------
 const stageSuggestions = {
   stage1: [
@@ -78,7 +81,7 @@ function populateQuestionSuggestions(stageKey) {
   });
 }
 
-// Hook up dropdowns only if they exist
+// Hook up dropdowns
 if (stageSelect) {
   stageSelect.addEventListener("change", () => {
     populateQuestionSuggestions(stageSelect.value);
@@ -148,6 +151,14 @@ form.addEventListener("submit", async (e) => {
   const text = input.value.trim();
   if (!text) return;
 
+  const section = stageSelect ? stageSelect.value : "";
+
+  // Update local history (keep it short)
+  history.push({ role: "user", content: text });
+  if (history.length > 10) {
+    history = history.slice(history.length - 10);
+  }
+
   addMessage("user", text);
   input.value = "";
   isWaiting = true;
@@ -158,7 +169,7 @@ form.addEventListener("submit", async (e) => {
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
+      body: JSON.stringify({ section, message: text, history })
     });
 
     if (!res.ok) {
@@ -167,10 +178,17 @@ form.addEventListener("submit", async (e) => {
 
     const data = await res.json();
     removeTypingIndicator();
-    addMessage(
-      "assistant",
-      data.reply || "I’m not sure what happened – try asking again a slightly different way."
-    );
+
+    const replyText =
+      data.reply || "I’m not sure what happened – try asking again a slightly different way.";
+
+    addMessage("assistant", replyText);
+
+    // Add assistant message to history
+    history.push({ role: "assistant", content: replyText });
+    if (history.length > 10) {
+      history = history.slice(history.length - 10);
+    }
   } catch (err) {
     console.error(err);
     removeTypingIndicator();

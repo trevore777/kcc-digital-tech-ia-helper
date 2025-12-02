@@ -1,13 +1,27 @@
-const OpenAI = require("openai");
+// Vercel serverless function at /api/chat
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ reply: "Method not allowed" });
   }
 
   try {
-    const { message } = req.body || {};
+    // Read raw body and parse JSON (works reliably on Vercel)
+    let body = "";
+    for await (const chunk of req) {
+      body += chunk;
+    }
+
+    let parsed = {};
+    try {
+      parsed = JSON.parse(body || "{}");
+    } catch (e) {
+      console.error("JSON parse error:", e);
+      return res.status(400).json({ reply: "Invalid JSON in request body." });
+    }
+
+    const { section, message, history } = parsed;
 
     if (!message || typeof message !== "string") {
       return res.status(400).json({ reply: "Please send a valid message." });
@@ -18,16 +32,15 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ reply: "Server not configured correctly." });
     }
 
-    const client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
-    });
+    // Build messages array for OpenAI, including short history if provided
+    const chatHistory = Array.isArray(history)
+      ? history.map((m) => ({
+          role: m.role === "assistant" ? "assistant" : "user",
+          content: m.content
+        }))
+      : [];
 
-    const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: `
+    const systemPrompt = `
 You are an AI learning coach for Year 7–8 Digital Technologies students at King's Christian College in Queensland.
 
 CONTEXT:
@@ -53,26 +66,53 @@ YOUR BEHAVIOUR:
   Live Purposefully, Love Faithfully, Learn Passionately, Lead Diligently.
 - Occasionally name an ACARA code in simple terms, e.g.
   "This links to AC9TDI8P05 – designing algorithms."
-`
-        },
-        { role: "user", content: message }
-      ],
-      temperature: 0.6,
-      max_tokens: 450
+
+If the user mentions they are on a specific stage (1–8) or section, tailor your guidance to that part of the project.
+`;
+
+    const messages = [
+      { role: "system", content: systemPrompt },
+      ...chatHistory,
+      {
+        role: "user",
+        content: section
+          ? `(Section: ${section}) ${message}`
+          : message
+      }
+    ];
+
+    const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages,
+        temperature: 0.6,
+        max_tokens: 450
+      })
     });
 
+    if (!openaiRes.ok) {
+      const errorText = await openaiRes.text();
+      console.error("OpenAI API error:", openaiRes.status, errorText);
+      return res.status(500).json({
+        reply: "The IA Helper had an issue talking to OpenAI. Please try again later."
+      });
+    }
+
+    const data = await openaiRes.json();
     const reply =
-      (response.choices &&
-        response.choices[0] &&
-        response.choices[0].message &&
-        response.choices[0].message.content) ||
+      data.choices?.[0]?.message?.content ||
       "I couldn’t generate a reply. Try asking again in a different way.";
 
     return res.status(200).json({ reply });
   } catch (error) {
-    console.error("OpenAI error:", error);
+    console.error("IA Helper error:", error);
     return res
       .status(500)
       .json({ reply: "The IA Helper had an error. Please try again or tell your teacher." });
   }
-};
+}
