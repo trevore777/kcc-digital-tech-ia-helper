@@ -8,7 +8,7 @@ const useQuestionBtn = document.getElementById("use-question");
 
 let isWaiting = false;
 
-// Stage-based suggestion library
+// ---------- Stage-based suggestion library ----------
 const stageSuggestions = {
   stage1: [
     "I’m on Stage 1 and I don’t really understand what a digital system is. Can you explain it simply?",
@@ -53,7 +53,8 @@ const stageSuggestions = {
 };
 
 function populateQuestionSuggestions(stageKey) {
-  // Clear current options
+  if (!questionSelect) return;
+
   questionSelect.innerHTML = "";
 
   if (!stageKey || !stageSuggestions[stageKey]) {
@@ -77,20 +78,23 @@ function populateQuestionSuggestions(stageKey) {
   });
 }
 
-// When stage changes, update suggestion list
-stageSelect.addEventListener("change", () => {
-  populateQuestionSuggestions(stageSelect.value);
-});
+// Hook up dropdowns only if they exist
+if (stageSelect) {
+  stageSelect.addEventListener("change", () => {
+    populateQuestionSuggestions(stageSelect.value);
+  });
+}
 
-// When "Use suggestion" is clicked, fill the input box
-useQuestionBtn.addEventListener("click", () => {
-  const selectedValue = questionSelect.value;
-  if (!selectedValue) return;
-  input.value = selectedValue;
-  input.focus();
-});
+if (useQuestionBtn && questionSelect) {
+  useQuestionBtn.addEventListener("click", () => {
+    const selectedValue = questionSelect.value;
+    if (!selectedValue) return;
+    input.value = selectedValue;
+    input.focus();
+  });
+}
 
-// Chat UI helpers
+// ---------- Chat UI helpers ----------
 
 function addMessage(role, text) {
   const wrapper = document.createElement("div");
@@ -129,13 +133,14 @@ function removeTypingIndicator() {
   if (typing) typing.remove();
 }
 
-// Initial greeting
+// Initial message
 addMessage(
   "assistant",
-  "Hi! I’m your Digital Tech IA Helper for King’s. Use the stage menu above if you like, or just tell me what you’re working on – digital systems, data/binary, APIs, user stories, algorithms, Swift code, or your video reflection."
+  "Hi! I’m your Digital Tech IA Helper for King’s. Use the stage menu above for ideas, or just tell me what you’re working on – digital systems, data/binary, APIs, user stories, algorithms, Swift code, or your video reflection."
 );
 
-// Form submit (send question to backend)
+// ---------- Chat submit logic ----------
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (isWaiting) return;
@@ -162,7 +167,10 @@ form.addEventListener("submit", async (e) => {
 
     const data = await res.json();
     removeTypingIndicator();
-    addMessage("assistant", data.reply || "I’m not sure what happened – try asking again in a different way.");
+    addMessage(
+      "assistant",
+      data.reply || "I’m not sure what happened – try asking again a slightly different way."
+    );
   } catch (err) {
     console.error(err);
     removeTypingIndicator();
@@ -177,5 +185,5 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-// Initialise suggestion dropdown in default state
+// Initialise suggestions
 populateQuestionSuggestions("");
